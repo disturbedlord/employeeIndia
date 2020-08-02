@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:employeeindia_atg/Screens/ProfilePage.dart';
 import 'package:employeeindia_atg/Screens/SubmitWork.dart';
+import 'package:employeeindia_atg/Screens/persistenceDataModel.dart';
 import 'package:employeeindia_atg/Screens/tokenClass.dart';
 import 'package:employeeindia_atg/utilities/PostData.dart';
 import 'package:employeeindia_atg/utils/colors.dart';
@@ -65,7 +66,7 @@ class _LevelPageState extends State<LevelPage> {
   List<int> cardLevels;
   Post profileData;
   bool showLoading = true;
-  String _token;
+  // String _token;
 
   Widget listOfLevelCards() {
     bool flag = true;
@@ -89,13 +90,25 @@ class _LevelPageState extends State<LevelPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _token = token;
+    // _token = token;
     getProfileData();
+
+    // if (persLevels == null) {
+    // } else {
+    //   profileData = persLevels;
+    //   cardLevels = [
+    //     for (int i = profileData.level; i < profileData.level + 10; i++) i
+    //   ];
+    //   setState(() {
+    //     showLoading = false;
+    //   });
+    // }
   }
 
   getProfileData() async {
-    print("calling profile ${_token}");
-    profileData = await profile(_token);
+    // print("calling profile ${_token}");
+    profileData = await profile(token);
+    persLevels = profileData;
     cardLevels = [
       for (int i = profileData.level; i < profileData.level + 10; i++) i
     ];
@@ -116,7 +129,7 @@ class _LevelPageState extends State<LevelPage> {
         appBar: AppBar(
             title: Text(
               "Levels",
-              style: GoogleFonts.poppins(color: Colors.black),
+              style: GoogleFonts.poppins(color: Colors.black, fontSize: 35.sp),
             ),
             elevation: 0,
             backgroundColor: Colors.white,
@@ -131,12 +144,9 @@ class _LevelPageState extends State<LevelPage> {
               )
             ]),
         body: showLoading
-            ? Center(
-                child: CupertinoActivityIndicator(
-                radius: 30.h,
-              ))
+            ? Center(child: CupertinoActivityIndicator())
             : Padding(
-                padding: EdgeInsets.only(top: 20.h),
+                padding: EdgeInsets.only(left: 30.w, right: 30.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -167,7 +177,7 @@ class LevelCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return PaddingWidget(
       child: Container(
-        height: 400.h,
+        height: 350.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: colors["blueLevelCard"],
@@ -205,7 +215,7 @@ class LevelCardWidget extends StatelessWidget {
                   children: <Widget>[
                     Text("LEVEL $level",
                         style: GoogleFonts.poppins(
-                            fontSize: 50.sp,
+                            fontSize: 40.sp,
                             fontWeight: FontWeight.bold,
                             color: colors["blueLevelCard"])),
                     Row(
@@ -280,7 +290,7 @@ class LevelCardWidgetUnlocked extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           Container(
-            height: 400.h,
+            height: 350.h,
             width: double.infinity,
             decoration: BoxDecoration(
               color: colors["blackCardUnlocked"],
@@ -318,7 +328,7 @@ class LevelCardWidgetUnlocked extends StatelessWidget {
                       children: <Widget>[
                         Text("LEVEL $level",
                             style: GoogleFonts.poppins(
-                                fontSize: 50.sp,
+                                fontSize: 40.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xff4D4D4D))),
                         Row(
@@ -375,7 +385,7 @@ class LevelCardWidgetUnlocked extends StatelessWidget {
             ),
           ),
           Container(
-            height: 400.h,
+            height: 350.h,
             width: double.infinity,
             child: Center(
               child: Icon(
@@ -404,7 +414,7 @@ class LevelCardText extends StatelessWidget {
     return Container(
       child: Text(
         text,
-        style: GoogleFonts.poppins(fontSize: 20.sp, color: color),
+        style: GoogleFonts.poppins(fontSize: 18.sp, color: color),
       ),
     );
   }

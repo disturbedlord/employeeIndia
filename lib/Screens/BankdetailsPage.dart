@@ -28,31 +28,33 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
           backgroundColor: Colors.white,
           title: Text(
             "Add Bank Details",
-            style: GoogleFonts.poppins(color: Colors.black),
+            style: GoogleFonts.poppins(color: Colors.black, fontSize: 35.sp),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
-              BankInputFields(text: "Account Number"),
-              SizedBox(
-                height: 20.h,
-              ),
-              BankInputFields(text: "Ifsc Code"),
-              SizedBox(
-                height: 20.h,
-              ),
-              BankInputFields(text: "UPI"),
-              SizedBox(
-                height: 30.h,
-              ),
-              FlatButton(
-                color: Colors.red[300],
-                child: Text("Save"),
-                onPressed: () {},
-              )
-            ],
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                BankInputFields(text: "Account Number"),
+                SizedBox(
+                  height: 20.h,
+                ),
+                BankInputFields(text: "Ifsc Code"),
+                SizedBox(
+                  height: 20.h,
+                ),
+                BankInputFields(text: "UPI"),
+                SizedBox(
+                  height: 30.h,
+                ),
+                FlatButton(
+                  color: Colors.red[300],
+                  child: Text("Save"),
+                  onPressed: () {},
+                )
+              ],
+            ),
           ),
         ),
       ),

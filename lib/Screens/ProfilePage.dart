@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:employeeindia_atg/Screens/BankdetailsPage.dart';
+import 'package:employeeindia_atg/Screens/persistenceDataModel.dart';
 import 'package:employeeindia_atg/Screens/tokenClass.dart';
 import 'package:employeeindia_atg/utilities/PostData.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -41,11 +43,19 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getProfileData();
+    if (persProfile == null) {
+      getProfileData();
+    } else {
+      profileData = persProfile;
+      setState(() {
+        gotProfileData = true;
+      });
+    }
   }
 
   getProfileData() async {
     profileData = await profile(token);
+    persProfile = profileData;
     setState(() {
       gotProfileData = true;
     });
@@ -53,6 +63,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+        width: 720,
+        height: 1280,
+        allowFontScaling: false); //flutter_screenuitl >= 1.2
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
@@ -60,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
             elevation: 0,
             title: Text(
               "Profile",
-              style: GoogleFonts.poppins(color: Colors.black),
+              style: GoogleFonts.poppins(color: Colors.black, fontSize: 35.sp),
             ),
             actions: <Widget>[
               IconButton(
@@ -75,85 +89,58 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           body: Center(
             child: gotProfileData
-                ? SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
+                ? Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        ContainerWidget(
+                          height: 300.h,
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CircleAvatar(
+                                maxRadius: 70.h,
+                                child: Icon(FontAwesomeIcons.user),
+                              ),
+                              ContainersTextBox(text: "Username")
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                    color: Color(0xffFFB700),
-                                    borderRadius: BorderRadius.circular(30)),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      child: Icon(
-                                        FontAwesomeIcons.user,
-                                        size: 50.0,
-                                      ),
-                                      radius: 50.0,
-                                    ),
-                                    Text(
-                                      "UserName",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 18,
-                                        color: Color(0xffAC3F21),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Expanded(
-                              flex: 6,
-                              child: Container(
-                                child: Column(
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        ProfilePersonalSection(text: "About"),
-                                        ProfilePersonalSection(text: "Skills")
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 20.0,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        ProfilePersonalSection(text: "Work"),
-                                        GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          BankDetailsPage()));
-                                            },
-                                            child: ProfilePersonalSection(
-                                                text: "Setting"))
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
+                            ContainerWidget(
+                                child: ContainersTextBox(text: "About"),
+                                width: WIDTH / 2 - 40.w,
+                                height: 250.h),
+                            ContainerWidget(
+                                child: ContainersTextBox(text: "Skills"),
+                                width: WIDTH / 2 - 40.w,
+                                height: 250.h),
                           ],
                         ),
-                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            ContainerWidget(
+                                child: ContainersTextBox(text: "Work"),
+                                width: WIDTH / 2 - 40.w,
+                                height: 250.h),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/BankDetailsPage');
+                              },
+                              child: ContainerWidget(
+                                  child: ContainersTextBox(text: "Settings"),
+                                  width: WIDTH / 2 - 40.w,
+                                  height: 250.h),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   )
                 : CupertinoActivityIndicator(),
@@ -162,19 +149,36 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class ProfilePersonalSection extends StatelessWidget {
-  const ProfilePersonalSection({Key key, @required this.text})
+class ContainerWidget extends StatelessWidget {
+  const ContainerWidget(
+      {Key key,
+      @required this.child,
+      @required this.width,
+      @required this.height})
       : super(key: key);
+
+  final Widget child;
+  final double width, height;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+          color: Color(0xffFFB700), borderRadius: BorderRadius.circular(30.h)),
+      child: child,
+    );
+  }
+}
+
+class ContainersTextBox extends StatelessWidget {
+  const ContainersTextBox({Key key, @required this.text}) : super(key: key);
 
   final String text;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
-      width: 150,
-      decoration: BoxDecoration(
-          color: Color(0xffFFb700), borderRadius: BorderRadius.circular(20)),
       child: Center(
         child: Text(
           text,

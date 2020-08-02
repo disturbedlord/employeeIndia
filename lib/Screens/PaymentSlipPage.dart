@@ -21,10 +21,6 @@ class _PaymentSlipState extends State<PaymentSlip> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.init(
-        width: 720,
-        height: 1280,
-        allowFontScaling: false); //flutter_screenuitl >= 1.2
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(

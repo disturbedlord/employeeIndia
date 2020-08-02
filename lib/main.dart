@@ -1,4 +1,5 @@
 import 'package:employeeindia_atg/Screens/ApplyJob.dart';
+import 'package:employeeindia_atg/Screens/BankdetailsPage.dart';
 import 'package:employeeindia_atg/Screens/LevelPage.dart';
 import 'package:employeeindia_atg/Screens/LoginPage.dart';
 import 'package:employeeindia_atg/Screens/MyWorkPage.dart';
@@ -46,7 +47,8 @@ class MyApp extends StatelessWidget {
         '/ProfilePage': (context) => ProfilePage(),
         '/SubmitWork': (context) => SubmitWork(),
         '/ApplyJob': (context) => ApplyJob(),
-        '/PaymentSlip': (context) => PaymentSlip()
+        '/PaymentSlip': (context) => PaymentSlip(),
+        '/BankDetailsPage': (context) => BankDetailsPage(),
       },
     );
   }

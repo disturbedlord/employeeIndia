@@ -3,7 +3,7 @@ import 'dart:convert';
 class Post {
   String access;
   String refresh, expiry;
-
+  // static
   String detail;
   String message;
 
@@ -11,6 +11,7 @@ class Post {
   String employeeName;
   String perks;
   int level;
+  String referralID;
   String balance;
 
   // submitWork Var
@@ -27,12 +28,32 @@ class Post {
   String requirements;
   List<dynamic> gigs;
 
+  // Apply Gigs
+  int maximum_applications;
+  int applications;
+  String addGigMessage;
+  String referral;
+  String non_field_errors;
+  String error;
+
   Post.login({this.access, this.refresh, this.expiry});
   Post.forgotPassword({this.detail});
   Post.signUp({this.message});
-  Post.profile({this.employeeName, this.perks, this.level, this.balance});
+  Post.profile(
+      {this.employeeName,
+      this.level,
+      this.perks,
+      this.referralID,
+      this.balance});
   Post.submitWork({this.status});
   Post.getAllGigs({this.gigs});
+  Post.addGig(
+      {this.maximum_applications,
+      this.applications,
+      this.addGigMessage,
+      this.referral,
+      this.non_field_errors,
+      this.error});
 
   factory Post.fromJson(String val, Map<String, dynamic> json) {
     Post data;
@@ -57,6 +78,7 @@ class Post {
         employeeName: json["Employee Name"],
         perks: json["Current Perks"],
         level: json["Current Level"],
+        referralID: json["Referral ID"],
         balance: json["Current Balance"],
       );
     }
@@ -69,6 +91,18 @@ class Post {
 
     if (val == "getAllGigs") {
       data = Post.getAllGigs(gigs: json["gigs"]);
+    }
+
+    if (val == "addGig") {
+      data = Post.addGig(
+          maximum_applications: json["maximum_applications"],
+          applications: json["applications"],
+          addGigMessage: json["message"],
+          referral: json["referral"],
+          non_field_errors: json["non_field_errors"] == null
+              ? null
+              : json["non_field_errors"][0],
+          error: json["error"] == null ? null : json["error"]);
     }
 
     return data;

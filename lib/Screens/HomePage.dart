@@ -1,7 +1,8 @@
 import 'dart:convert';
-
 import 'package:employeeindia_atg/Screens/ApplyJob.dart';
+import 'package:employeeindia_atg/Screens/MyWorkPage.dart';
 import 'package:employeeindia_atg/Screens/PaymentSlipPage.dart';
+import 'package:employeeindia_atg/Screens/persistenceDataModel.dart';
 import 'package:employeeindia_atg/Screens/tokenClass.dart';
 import 'package:employeeindia_atg/utilities/PostData.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 Future<Post> getAllGigs(String token) async {
+  print("home");
   String url = "https://employedindia.in/api/allgigs/";
 
   final http.Response response = await http.get(
@@ -40,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   Post postData;
   List<dynamic> data;
   bool showLoader = true;
+  bool showErrorPage = false;
   List<Widget> trendingGigsList = [];
 
   List<Widget> trendingGigs() {
@@ -57,6 +60,12 @@ class _HomePageState extends State<HomePage> {
 
   allGigs(String token) async {
     postData = await getAllGigs(token);
+    if (postData == null) {
+      setState(() {
+        showErrorPage = true;
+      });
+    }
+    persTrendingGigs = postData;
     print(postData.gigs.length);
     data = postData.gigs;
     print(data);
@@ -69,7 +78,17 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    allGigs(token);
+
+    referralID = persProfile.referralID;
+
+    if (persTrendingGigs == null) {
+      allGigs(token);
+    } else {
+      setState(() {
+        showLoader = false;
+      });
+      data = persTrendingGigs.gigs;
+    }
   }
 
   @override
@@ -79,120 +98,146 @@ class _HomePageState extends State<HomePage> {
         height: 1280,
         allowFontScaling: false); //flutter_screenuitl >= 1.2
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {},
-            icon: Icon(FontAwesomeIcons.bars),
-            color: Colors.black,
-            iconSize: 40.h,
-          ),
-          centerTitle: true,
-          title: Text(
-            "Level 1",
-            style: TextStyle(color: Colors.black, fontSize: 15),
-          ),
-          actions: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaymentSlip()),
-                );
-              },
-              icon: Icon(FontAwesomeIcons.rupeeSign),
-              color: Colors.black,
-              iconSize: 40.h,
-            )
-          ],
-        ),
-        body: showLoader
-            ? Center(
-                child: CupertinoActivityIndicator(
-                radius: 30.h,
-              ))
-            : Padding(
-                padding: EdgeInsets.only(left: 30.w, right: 30.w),
-                child: ListView(children: <Widget>[
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height +
-                            trendingGigsList.length * 180.h),
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Container(
-                            height: 150.h,
-                            decoration: BoxDecoration(
-                              color: Color(0xffE8F1FD),
-                              borderRadius: BorderRadius.circular(30.h),
-                            ),
-                            child: Center(
-                                child: Text(
-                              "Hello, Anjali!",
-                              style: GoogleFonts.poppins(fontSize: 30.sp),
-                            )),
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 10.0, bottom: 10.0, left: 5.0),
-                              child: Text(
-                                "Categories",
-                                style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 35.sp),
-                              ),
-                            ),
-                            CategoriesWidgetRow(
-                              txt1: "Digital Marketing",
-                              color1: Color(0xffF75266),
-                              txt2: "Brand Marketing",
-                              color2: Color(0xff3FCEDE),
-                            ),
-                            SizedBox(
-                              height: 30.h,
-                            ),
-                            CategoriesWidgetRow(
-                              txt1: "Telecaller Marketing",
-                              color1: Color(0xff704DFA),
-                              txt2: "Field Marketing",
-                              color2: Color(0xffF68A35),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20.h,
-                        ),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 00.0, bottom: 10.0, left: 5.0),
-                            child: Text(
-                              "Trending Gigs",
-                              style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.bold, fontSize: 35.sp),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          children: trendingGigs(),
-                        )
-                      ],
-                    ),
-                  ),
-                ]),
+      child: showErrorPage
+          ? Scaffold(
+              body: Center(
+                child: Text(
+                  "Something went wrong!!!",
+                  style:
+                      GoogleFonts.poppins(color: Colors.black, fontSize: 30.sp),
+                ),
               ),
-      ),
+            )
+          : Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                leading: IconButton(
+                  onPressed: () {},
+                  icon: Icon(FontAwesomeIcons.bars),
+                  color: Colors.black,
+                  iconSize: 40.h,
+                ),
+                centerTitle: true,
+                title: Text(
+                  "Level ${persProfile.level}",
+                  style: TextStyle(color: Colors.black, fontSize: 30.sp),
+                ),
+                actions: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PaymentSlip()),
+                      );
+                    },
+                    icon: Icon(FontAwesomeIcons.rupeeSign),
+                    color: Colors.black,
+                    iconSize: 40.h,
+                  )
+                ],
+              ),
+              body: showLoader
+                  ? Center(
+                      child: CupertinoActivityIndicator(
+                      radius: 30.h,
+                    ))
+                  : Padding(
+                      padding: EdgeInsets.only(left: 30.w, right: 30.w),
+                      child: ListView(children: <Widget>[
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minHeight: MediaQuery.of(context).size.height +
+                                          trendingGigsList.length *
+                                              trendingGigsList.length ==
+                                      1
+                                  ? 0.h
+                                  : 180.h),
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Container(
+                                    height: 150.h,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffE8F1FD),
+                                      borderRadius: BorderRadius.circular(30.h),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          "Hello, ",
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 30.sp),
+                                        ),
+                                        Text(
+                                          "${persProfile.employeeName}!",
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 30.sp,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    )),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, bottom: 10.0, left: 5.0),
+                                    child: Text(
+                                      "Categories",
+                                      style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 35.sp),
+                                    ),
+                                  ),
+                                  CategoriesWidgetRow(
+                                    txt1: "Digital Marketing",
+                                    color1: Color(0xffF75266),
+                                    txt2: "Brand Marketing",
+                                    color2: Color(0xff3FCEDE),
+                                  ),
+                                  SizedBox(
+                                    height: 30.h,
+                                  ),
+                                  CategoriesWidgetRow(
+                                    txt1: "Telecaller Marketing",
+                                    color1: Color(0xff704DFA),
+                                    txt2: "Field Marketing",
+                                    color2: Color(0xffF68A35),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 20.h,
+                              ),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 00.0, bottom: 10.0, left: 5.0),
+                                  child: Text(
+                                    "Trending Gigs",
+                                    style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 35.sp),
+                                  ),
+                                ),
+                              ),
+                              Column(
+                                children: trendingGigs(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                    ),
+            ),
     );
   }
 }
@@ -221,6 +266,7 @@ class GigsCard extends StatelessWidget {
         },
         child: Container(
           width: MediaQuery.of(context).size.width - 80.w,
+          height: 500.h,
           decoration: BoxDecoration(
               color: Color(0xffBD5336),
               borderRadius: BorderRadius.circular(40.w)),
@@ -233,7 +279,7 @@ class GigsCard extends StatelessWidget {
                   CircleAvatar(
                     backgroundColor: Colors.white,
                     child: Image.network(
-                      "https://employedindia.in${data["profile_image"]}",
+                      data["profile_image"],
                       height: 50.h,
                       width: 50.h,
                     ),
@@ -270,51 +316,16 @@ class GigsCard extends StatelessWidget {
               Container(
                 height: 200.h,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30.h),
-                        border: Border.all(
-                          width: 5,
-                          color: Color(0xffFFD645),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 9.0),
-                        child: Text(
-                          data["total_target"].toString(),
-                          style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30.sp),
-                        ),
-                      ),
+                    TextWidgetWithYellowBorder(
+                      data: data["total_company_target"],
+                      dataText: "Total Target",
                     ),
-                    SizedBox(
-                      width: 40.w,
+                    TextWidgetWithYellowBorder(
+                      data: data["target_left"],
+                      dataText: "Target Left",
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30.h),
-                        border: Border.all(
-                          width: 5,
-                          color: Color(0xffFFD645),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30.0, vertical: 9.0),
-                        child: Text(
-                          data["target_achieved"].toString(),
-                          style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30.sp),
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),
@@ -330,7 +341,7 @@ class GigsCard extends StatelessWidget {
                           topLeft: Radius.circular(30.h),
                           bottomLeft: Radius.circular(30.h))),
                   child: Text(
-                    "Rs 2600 - Rs 4000",
+                    "Rs ${data["min_earning"]} - Rs ${data["max_earning"]}",
                     style: GoogleFonts.poppins(
                         color: Color(0xff8C3017), fontWeight: FontWeight.bold),
                   ),
@@ -369,10 +380,9 @@ class CategoriesWidgetRow extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  txt1,
-                  style: GoogleFonts.poppins(color: Colors.white),
-                )
+                Text(txt1,
+                    style: GoogleFonts.poppins(
+                        color: Colors.white, fontSize: 28.sp))
               ],
             ),
           ),
@@ -389,7 +399,9 @@ class CategoriesWidgetRow extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(txt2, style: GoogleFonts.poppins(color: Colors.white))
+                Text(txt2,
+                    style: GoogleFonts.poppins(
+                        color: Colors.white, fontSize: 28.sp))
               ],
             ),
           ),

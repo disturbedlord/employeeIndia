@@ -6,4 +6,5 @@ const Map<String, Color> colors = {
   "lightGrey": Color(0xff99A1B3),
   "blueLevelCard": Color(0xff7950F2),
   "blackCardUnlocked": Color(0xff19191A),
+  "darkBrown": Color(0xff8C3017),
 };

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:employeeindia_atg/Screens/tokenClass.dart';
 import 'package:employeeindia_atg/utilities/PostData.dart';
 import 'package:employeeindia_atg/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +21,11 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController email = new TextEditingController();
   TextEditingController password1 = new TextEditingController();
   TextEditingController password2 = new TextEditingController();
+
+  bool showLoader = false;
+  bool showVerifyModal = false;
+  bool showPassword1 = false;
+  bool showPassword2 = false;
 
   Post data;
 
@@ -66,85 +72,298 @@ class _SignUpPageState extends State<SignUpPage> {
             icon: Icon(Icons.arrow_back, color: Colors.black),
           ),
         ),
-        body: Column(
+        body: Stack(
           children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(left: 40.w, right: 40.w, top: 50.h),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        TextFieldLoginPage(
-                            controller: name,
-                            text: "Name",
-                            passwordField: false),
-                        SizedBox(
-                          height: 30.h,
-                        ),
-                        TextFieldLoginPage(
-                            controller: email,
-                            text: "Email",
-                            passwordField: false),
-                        SizedBox(
-                          height: 30.h,
-                        ),
-                        TextFieldLoginPage(
-                            controller: password1,
-                            text: "Password",
-                            passwordField: true),
-                        SizedBox(
-                          height: 30.h,
-                        ),
-                        TextFieldLoginPage(
-                          controller: password2,
-                          text: "Confirm Password",
-                          passwordField: true,
-                        ),
-                        SizedBox(
-                          height: 50.h,
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            data = await createPost(
-                                "https://employedindia.in/api/signup/",
-                                name.text,
-                                email.text,
-                                password1.text,
-                                password2.text);
+            Container(
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.only(left: 40.w, right: 40.w, top: 50.h),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: <Widget>[
+                              TextFieldLoginPage(
+                                  controller: name,
+                                  text: "Name",
+                                  passwordField: false),
+                              SizedBox(
+                                height: 30.h,
+                              ),
+                              TextFieldLoginPage(
+                                  controller: email,
+                                  text: "Email",
+                                  passwordField: false),
+                              SizedBox(
+                                height: 30.h,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 50.w),
+                                    child: Text(
+                                      "Password",
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 28.sp,
+                                          color: colors["lightGrey"]),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20.h),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 30.w),
+                                    child: Center(
+                                      child: TextField(
+                                        // autofocus: true,
+                                        onTap: () {
+                                          FocusScopeNode currentFocus =
+                                              FocusScope.of(context);
 
-                            if (data != null) {
-                              Toast.show(data.message, context,
-                                  duration: Toast.LENGTH_LONG,
-                                  gravity: Toast.BOTTOM);
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 40.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 80.h, vertical: 20.h),
-                            decoration: BoxDecoration(
-                                color: colors["brown"],
-                                borderRadius: BorderRadius.circular(50.h)),
-                            child: Text(
-                              "Sign Up",
-                              style: GoogleFonts.poppins(
-                                  color: Colors.white, fontSize: 35.sp),
+                                          currentFocus.focusedChild
+                                              .requestFocus();
+                                        },
+                                        controller: password1,
+                                        style: TextStyle(fontSize: 32.sp),
+                                        obscureText:
+                                            showPassword1 ? false : true,
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 30.h, horizontal: 30.h),
+                                          fillColor: colors["lightBlue"],
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                                BorderRadius.circular(50.w),
+                                          ),
+                                          suffixIconConstraints: BoxConstraints(
+                                              minHeight: 24.h, minWidth: 100.w),
+                                          suffixIcon: showPassword1
+                                              ? IconButton(
+                                                  icon: Icon(
+                                                    Icons.lock_open,
+                                                    size: 40.h,
+                                                  ),
+                                                  onPressed: () {
+                                                    // print("clicked");
+                                                    setState(() {
+                                                      showPassword1 =
+                                                          !showPassword1;
+                                                    });
+                                                  },
+                                                )
+                                              : IconButton(
+                                                  icon: Icon(
+                                                    Icons.lock_outline,
+                                                    size: 40.h,
+                                                  ),
+                                                  onPressed: () {
+                                                    // print("clicked");
+                                                    setState(() {
+                                                      showPassword1 =
+                                                          !showPassword1;
+                                                    });
+                                                  },
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 30.h,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 50.w),
+                                    child: Text(
+                                      "Confirm Password",
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 28.sp,
+                                          color: colors["lightGrey"]),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20.h),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 30.w),
+                                    child: Center(
+                                      child: TextField(
+                                        // autofocus: true,
+                                        onTap: () {
+                                          FocusScopeNode currentFocus =
+                                              FocusScope.of(context);
+
+                                          currentFocus.focusedChild
+                                              .requestFocus();
+                                        },
+                                        controller: password2,
+                                        style: TextStyle(fontSize: 32.sp),
+                                        obscureText:
+                                            showPassword2 ? false : true,
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 30.h, horizontal: 30.h),
+                                          fillColor: colors["lightBlue"],
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                                BorderRadius.circular(50.w),
+                                          ),
+                                          suffixIconConstraints: BoxConstraints(
+                                              minHeight: 24.h, minWidth: 100.w),
+                                          suffixIcon: showPassword2
+                                              ? IconButton(
+                                                  icon: Icon(
+                                                    Icons.lock_open,
+                                                    size: 40.h,
+                                                  ),
+                                                  onPressed: () {
+                                                    // print("clicked");
+                                                    setState(() {
+                                                      showPassword2 =
+                                                          !showPassword2;
+                                                    });
+                                                  },
+                                                )
+                                              : IconButton(
+                                                  icon: Icon(
+                                                    Icons.lock_outline,
+                                                    size: 40.h,
+                                                  ),
+                                                  onPressed: () {
+                                                    // print("clicked");
+                                                    setState(() {
+                                                      showPassword2 =
+                                                          !showPassword2;
+                                                    });
+                                                  },
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 50.h,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    showLoader = true;
+                                  });
+                                  data = await createPost(
+                                      "https://employedindia.in/api/signup/",
+                                      name.text,
+                                      email.text,
+                                      password1.text,
+                                      password2.text);
+
+                                  if (data != null) {
+                                    Toast.show(data.message, context,
+                                        duration: Toast.LENGTH_LONG,
+                                        gravity: Toast.BOTTOM);
+
+                                    setState(() {
+                                      showVerifyModal = true;
+                                      showLoader = false;
+                                    });
+
+                                    // Navigator.pushNamed(
+                                    //         context, '/NavigationPage')
+                                    //     .then((value) => {
+                                    //           setState(() {
+                                    //             showLoader = false;
+                                    //           })
+                                    //         });
+                                  } else {
+                                    setState(() {
+                                      showLoader = false;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 40.h),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 80.h, vertical: 20.h),
+                                  decoration: BoxDecoration(
+                                      color: colors["brown"],
+                                      borderRadius:
+                                          BorderRadius.circular(50.h)),
+                                  child: Text(
+                                    "Sign Up",
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.white, fontSize: 35.sp),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            showLoader ? ShowLoadingWidget() : Container(),
+            showVerifyModal
+                ? Container(
+                    decoration: BoxDecoration(color: Color(0xaaF5F5F7)),
+                    child: Center(
+                      child: Container(
+                        height: HEIGHT / 3,
+                        width: WIDTH / 1.2,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                      "Verify You Account through your registered mail to continue."),
+                                ),
+                                SizedBox(
+                                  height: 30.h,
+                                ),
+                                FlatButton(
+                                  color: Colors.green[300],
+                                  onPressed: () {
+                                    setState(() {
+                                      showVerifyModal = false;
+                                    });
+                                  },
+                                  child: Text("Ok"),
+                                )
+                              ],
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            )
+                  )
+                : Container()
           ],
         ),
       ),
@@ -228,6 +447,29 @@ class TextFieldLoginPage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ShowLoadingWidget extends StatelessWidget {
+  const ShowLoadingWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: Color(0xaaF5F5F7)),
+      child: Center(
+        child: Container(
+          height: HEIGHT / 4,
+          width: HEIGHT / 4,
+          decoration: BoxDecoration(
+              // color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(20.0)),
+          child: CupertinoActivityIndicator(),
+        ),
+      ),
     );
   }
 }
