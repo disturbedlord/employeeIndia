@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:employeeindia_atg/Screens/ApplyJob.dart';
 import 'package:employeeindia_atg/Screens/BankdetailsPage.dart';
 import 'package:employeeindia_atg/Screens/LevelPage.dart';
@@ -9,10 +10,12 @@ import 'package:employeeindia_atg/Screens/ProfilePage.dart';
 import 'package:employeeindia_atg/Screens/SignUpPage.dart';
 import 'package:employeeindia_atg/Screens/SubmitWork.dart';
 import 'package:employeeindia_atg/Screens/tokenClass.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(DevicePreview(
+      builder: (context) => MyApp(), enabled: true ? !kReleaseMode : false));
 }
 
 class MyApp extends StatelessWidget {

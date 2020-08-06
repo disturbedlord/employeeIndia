@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:employeeindia_atg/Screens/SignUpPage.dart';
 import 'package:employeeindia_atg/Screens/persistenceDataModel.dart';
 
 import 'tokenClass.dart';
@@ -266,6 +267,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               GestureDetector(
                                 onTap: () async {
+                                  FocusScope.of(context).unfocus();
                                   setState(() {
                                     showLoggingSpinner = true;
                                   });
@@ -284,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (data != null) {
                                     print(data.access);
                                     token = data.access;
-                                    print("token ${token}");
+                                    print("token $token");
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -364,8 +366,25 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 10.h,
                                   ),
                                   GestureDetector(
-                                    onTap: () => Navigator.pushNamed(
-                                        context, '/SignUpPage'),
+                                    onTap: () async {
+                                      final responseFromSignInPage =
+                                          await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SignUpPage()),
+                                      );
+                                      // final snackbar1 = SnackBar(
+                                      //   content: Text("Verify your Account"),
+                                      // );
+                                      print(responseFromSignInPage);
+                                      if (responseFromSignInPage == 1) {
+                                        // final snackbar1 = SnackBar(
+                                        //   content: Text("Verify your Account"),
+                                        // );
+                                      } else {}
+                                      // Scaffold.of(context)
+                                      //     .showSnackBar(snackbar1);
+                                    },
                                     child: Text(
                                       "Sign Up",
                                       style: GoogleFonts.poppins(

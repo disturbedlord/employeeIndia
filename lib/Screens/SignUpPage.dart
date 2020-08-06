@@ -26,6 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
   bool showVerifyModal = false;
   bool showPassword1 = false;
   bool showPassword2 = false;
+  bool accountCreatedStatus = false;
 
   Post data;
 
@@ -68,7 +69,7 @@ class _SignUpPageState extends State<SignUpPage> {
           centerTitle: true,
           backgroundColor: Colors.white,
           leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, 0),
             icon: Icon(Icons.arrow_back, color: Colors.black),
           ),
         ),
@@ -265,6 +266,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               GestureDetector(
                                 onTap: () async {
+                                  FocusScope.of(context).unfocus();
+
                                   setState(() {
                                     showLoader = true;
                                   });
@@ -281,17 +284,11 @@ class _SignUpPageState extends State<SignUpPage> {
                                         gravity: Toast.BOTTOM);
 
                                     setState(() {
-                                      showVerifyModal = true;
+                                      accountCreatedStatus = true;
                                       showLoader = false;
                                     });
 
-                                    // Navigator.pushNamed(
-                                    //         context, '/NavigationPage')
-                                    //     .then((value) => {
-                                    //           setState(() {
-                                    //             showLoader = false;
-                                    //           })
-                                    //         });
+                                    Navigator.pop(context, 1);
                                   } else {
                                     setState(() {
                                       showLoader = false;
@@ -323,47 +320,6 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             showLoader ? ShowLoadingWidget() : Container(),
-            showVerifyModal
-                ? Container(
-                    decoration: BoxDecoration(color: Color(0xaaF5F5F7)),
-                    child: Center(
-                      child: Container(
-                        height: HEIGHT / 3,
-                        width: WIDTH / 1.2,
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                      "Verify You Account through your registered mail to continue."),
-                                ),
-                                SizedBox(
-                                  height: 30.h,
-                                ),
-                                FlatButton(
-                                  color: Colors.green[300],
-                                  onPressed: () {
-                                    setState(() {
-                                      showVerifyModal = false;
-                                    });
-                                  },
-                                  child: Text("Ok"),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                : Container()
           ],
         ),
       ),
